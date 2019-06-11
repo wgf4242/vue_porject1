@@ -251,7 +251,7 @@ routes/users.js
       });
     });
 
-## Chapter 8 Node接口搭建-使用passport-jwt验证token
+## Chapter 8 Node接口搭建-使用jwt实现token
 
 使用 jsonwebtoken
 
@@ -272,3 +272,53 @@ routes/users.js
         })
       })
       // res.json({ msg: 'success' });
+
+## Chapter 9 Node接口搭建-使用passport-jwt验证token
+
+npm i passport-jwt passport
+
+server.js
+
+    const passport = require('passport');
+    ...
+    app.use(passport.initialize());
+    require('./config/passport')(passport);
+
+./routes/api/user.js
+
+    const passport = require('passport');
+    ...
+    router.get('/current', passport.authenticate('jwt', {session: false}), (req, res) => {
+      res.json({
+        id: req.user.id,
+        name: req.user.name,
+        email: req.user.email
+      });
+    })
+
+./config/passport.js
+
+    const JwtStrategy = require('passport-jwt').Strategy,
+    ExtractJwt = require('passport-jwt').ExtractJwt;
+    const mongoose = require('mongoose');
+    const User = mongoose.model('users');
+    const keys = require('../config/keys');
+
+
+    const opts = {}
+    opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
+    opts.secretOrKey = keys.secretOrKey;
+
+    module.exports = passport => {
+        passport.use(new JwtStrategy(opts, (jwt_payload, done) => {
+            console.log(jwt_payload);
+            User.findById(jwt_payload.id)
+                .then(user => {
+                    if (user) {
+                        return done(null, user);
+                    }
+                    return done(null, false)
+                })
+                .catch(err => console.log(err))
+        }));
+    }
