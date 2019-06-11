@@ -133,3 +133,53 @@ server.js
     // 使用 routes
     app.use("/api/users", users);
 
+
+
+# 4 搭建注册接口存储数据
+
+安装 body-parser 
+    
+    npm install body-parser
+
+./server.js
+
+    const bodyParser = require("body-parser");
+    ...
+    // 使用body-parse中间件
+    app.use(bodyParser.urlencoded({extended:false}));
+    app.use(bodyParser.json());
+
+加密使用 [bcrypt](https://www.npmjs.com/package/bcrypt)
+    
+    npm install bcrypt
+
+./routes/users.js 添加 register 接口
+    
+    router.post('/register', (req, res) => {
+      // console.log(req.body);
+
+      // 查询数据库中是否拥有邮箱
+      User.findOne({ email: req.body.email }).then(user => {
+        if (user) {
+          return res.status(400).json({ email: '邮箱已被注册' });
+        } else {
+          const newUser = new User({
+            name: req.body.name,
+            email: req.body.email,
+            password: req.body.password
+          })
+          bcrypt.genSalt(10, function(err, salt) {
+            bcrypt.hash(newUser.password, salt, function(err, hash) {
+              if (err) throw err;
+
+              newUser.password = hash;
+              
+              newUser
+                .save()
+                .then(user => res.json(user))
+                .catch(err => console.log(err));
+            });
+          });
+        }
+      });
+    });
