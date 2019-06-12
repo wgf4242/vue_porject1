@@ -21,6 +21,10 @@ const UserSchema = new Schesma({
     date: {
         type:Date,
         default:Date.now
+    },
+    identity:{
+        type:String,
+        required:true
     }
 })
 

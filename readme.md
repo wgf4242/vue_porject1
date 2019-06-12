@@ -322,3 +322,14 @@ server.js
                 .catch(err => console.log(err))
         }));
     }
+
+## Chapter 10 Node接口搭建-增加身份字段及接口调试
+
+    // 密码匹配
+    bcrypt.compare(password, user.password).then(isMatch => {
+      ...
+      identity:user.identity};
+
+    router.get('/current'... {
+      ...
+      identity: req.user.identity});
