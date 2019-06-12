@@ -12,9 +12,12 @@
 		* [Project](#project)
 	* [Chpater 3 接口搭建和路由](#chpater-3-接口搭建和路由)
 	* [Chapter 4 搭建注册接口存储数据](#chapter-4-搭建注册接口存储数据)
-	* [Chapter 5 Node接口搭建-使用全球公认头像gravatar](#Chapter-5-node接口搭建-使用全球公认头像gravatar)
-	* [Chapter 7 Node接口搭建-登录接口](#Chapter-7-node接口搭建-登录接口)
-	* [Chapter 8 Node接口搭建-使用passport-jwt验证token](#chapter-8-node接口搭建-使用passport-jwt验证token)
+	* [Chapter 5 Node接口搭建-使用全球公认头像gravatar](#chapter-5-node接口搭建-使用全球公认头像gravatar)
+	* [Chapter 7 Node接口搭建-登录接口](#chapter-7-node接口搭建-登录接口)
+	* [Chapter 8 Node接口搭建-使用jwt实现token](#chapter-8-node接口搭建-使用jwt实现token)
+	* [Chapter 9 Node接口搭建-使用passport-jwt验证token](#chapter-9-node接口搭建-使用passport-jwt验证token)
+	* [Chapter 10 Node接口搭建-增加身份字段及接口调试](#chapter-10-node接口搭建-增加身份字段及接口调试)
+	* [Chapter 13 Node接口搭建-更改数据库接口地址3](#chapter-13-node接口搭建-更改数据库接口地址3)
 
 <!-- /code_chunk_output -->
 
@@ -333,3 +336,63 @@ server.js
     router.get('/current'... {
       ...
       identity: req.user.identity});
+
+## Chapter 13 Node接口搭建-更改数据库接口地址3
+
+./routes/api/profiles.js
+
+    const express = require('express');
+    const router = express.Router();
+    const passport = require('passport');
+
+    const Profile = require('../../models/Profile');
+
+    router.get('/test', (req, res) => {
+      res.json({ msg: 'profile works' });
+    });
+
+    router.post( '/add', passport.authenticate('jwt', { session: false }), (req, res) => {
+        const profileFields = {};
+        if (req.body.type) profileFields.type = req.body.type;
+        if (req.body.describe) profileFields.describe = req.body.describe;
+        if (req.body.income) profileFields.income = req.body.income;
+        if (req.body.expend) profileFields.expend = req.body.expend;
+        if (req.body.cash) profileFields.cash = req.body.cash;
+        if (req.body.remark) profileFields.remark = req.body.remark;
+
+        new Profile(profileFields).save().then(profile => {
+          res.json(profile);
+        })
+      }
+    );
+    module.exports = router;
+
+./models/Profile.js
+
+    const mongoose = require('mongoose');
+    const Schesma = mongoose.Schema;
+    const ProfileSchema = new Schesma({
+      type: {
+        type: String
+      },
+      income: {
+        type: String,
+        required: true
+      },
+      expend: {
+        type: String,
+        required: true
+      },
+      cash: {
+        type: String
+      },
+      remark: {
+        type: String
+      },
+      date: {
+        type: Date,
+        default: Date.now
+      }
+    });
+
+    module.exports = Profile = mongoose.model('profile', ProfileSchema);

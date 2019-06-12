@@ -1,7 +1,7 @@
 {
 	"folders": [
 		{
-			"path": "./node-app"
+			"path": "."
 		}
 	],
 	"settings": {}

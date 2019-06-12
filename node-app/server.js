@@ -6,10 +6,11 @@ const passport = require('passport');
 
 // 引用 users.js
 const users = require("./routes/api/users");
+const profiles = require("./routes/api/profiles.js");
 
 // DB config
 // const db = require("./config/keys").mongoURI;
-const db = require("./config/keys").mongoURI2;
+const db = require("./config/keys").mongoURI;
 
 // 使用body-parse中间件
 app.use(bodyParser.urlencoded({extended:false}));
@@ -33,6 +34,7 @@ const port = process.env.PORT || 5000;
 
 // 使用 routes
 app.use("/api/users", users);
+app.use("/api/profiles", profiles);
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
